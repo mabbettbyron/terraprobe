@@ -7,8 +7,7 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [('skeleton', '0022_auto_20200829_0956'),
-    ]
+    dependencies = [('skeleton', '0001_initial')]
 
     operations = [
         migrations.RunSQL(

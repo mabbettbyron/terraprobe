@@ -546,6 +546,9 @@ class KCReading(models.Model):
         kc_text = str(self.kc)
         return crop_text + ":" + period_from_text + ":" + period_to_text + ":" + kc_text
 
+    class Meta:
+        unique_together = (('region', 'season', 'crop', 'period_from', 'period_to'))
+
 '''
 The ET data comes via Hortplus as a daily ET based on a refrence crop (grass) for a Weatherstation (Havelock North)
 
