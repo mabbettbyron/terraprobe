@@ -123,14 +123,16 @@ class CreateSeasonResourcesView(PermissionRequiredMixin, CreateView):
 
                     for site in sites:
                         # get the full point and refill readings from the last season (season_from). We need to get the sites season start and end
+                        # if non exist, skip
                         dates = get_site_season_start_end(site, season_from)
-                        readings = Reading.objects.select_related('site').filter(Q(type=2)|Q(type=3), site=site, date__range=(dates.period_from, dates.period_to))
-
-                        for r in readings:
-                            fpr = Reading(date=r.date + relativedelta(years=+1), type=r.type, site=r.site, created_by = request.user, serial_number=probe, reviewed=True,
-                                depth1=r.depth1, depth2=r.depth2, depth3=r.depth3, depth4=r.depth4, depth5=r.depth5, depth6=r.depth6, depth7=r.depth7, depth8=r.depth8,
-                                depth9=r.depth9, depth10=r.depth10, rz1=r.rz1, rz2=r.rz2, rz3=r.rz3)
-                            fpr.save()
+                        if dates:
+                            readings = Reading.objects.select_related('site').filter(Q(type=2)|Q(type=3), site=site, date__range=(dates.period_from, dates.period_to))
+                            logger.debug(str(readings))
+                            for r in readings:
+                                fpr = Reading(date=r.date + relativedelta(years=+1), type=r.type, site=r.site, created_by = request.user, serial_number=probe, reviewed=True,
+                                    depth1=r.depth1, depth2=r.depth2, depth3=r.depth3, depth4=r.depth4, depth5=r.depth5, depth6=r.depth6, depth7=r.depth7, depth8=r.depth8,
+                                    depth9=r.depth9, depth10=r.depth10, rz1=r.rz1, rz2=r.rz2, rz3=r.rz3)
+                                fpr.save()
 
             except Exception as e:
                 messages.error(request, "Error: " + str(e))
