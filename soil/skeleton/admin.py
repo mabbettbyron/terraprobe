@@ -138,6 +138,7 @@ class CriticalDateAdmin(admin.ModelAdmin):
 class SeasonStartEndAdmin(admin.ModelAdmin):
     list_display = ['site',  'season', 'period_from', 'period_to', 'season_current_flag', ]
     list_filter = ('season', 'season_current_flag')
+    search_fields = ['site__name', 'site__site_number']
     list_display_links = None
 
     def has_add_permission(self, request, obj=None):

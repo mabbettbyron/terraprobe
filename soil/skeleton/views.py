@@ -74,7 +74,7 @@ class ProbeDivinerListView(PermissionRequiredMixin, ListView):
     template_name = 'probe_diviner/list.html'
 
 """
-    This creates new critical dates and kc readings for a new season.
+    This creates new critical dates, full point/refill readings and kc readings for a new season.
     The user chooses which season to create from and which season to create into.
 
 """
@@ -90,28 +90,50 @@ class CreateSeasonResourcesView(PermissionRequiredMixin, CreateView):
 
         season_from = request.POST['season_from']
         season_to = request.POST['season_to']
+        cd_flag = request.POST.get('critical_date', False)
+        fpr_flag = request.POST.get('fullpoint_refill', False)
+        cc_flag = request.POST.get('crop_coefficient', False)
 
         if season_from == season_to:
             messages.error(request, "Season from and Season to are the same. They must be different.")
         else:
-            season_from = Season.objects.get(id=season_from)
-            critical_dates = CriticalDate.objects.filter(season=season_from)
+            try:
+                season_from = Season.objects.get(id=season_from)
+                if cd_flag:
+                    critical_dates = CriticalDate.objects.filter(season=season_from)
 
-            kc_readings = KCReading.objects.filter(season=season_from)
+                    # add a year to every date
+                    for critical_date in critical_dates:
+                        cd = CriticalDate(site = critical_date.site, date = critical_date.date + relativedelta(years=+1), created_by = request.user,
+                            type = critical_date.type, season_id = season_to)
+                        cd.save()
+                if cc_flag:
+                    kc_readings = KCReading.objects.filter(season=season_from)
 
-            # add a year to every date
-            for critical_date in critical_dates:
-                cd = CriticalDate(site = critical_date.site, date = critical_date.date + relativedelta(years=+1), created_by = request.user,
-                    type = critical_date.type, season_id = season_to)
-                logger.debug(str(cd))
-                cd.save()
+                    # add a year to every period_from and period_to date
+                    for kc_reading in kc_readings:
+                        kc = KCReading(period_from = kc_reading.period_from + relativedelta(years=+1), period_to = kc_reading.period_to + relativedelta(years=+1),
+                            season_id = season_to, created_by = request.user, region = kc_reading.region, crop = kc_reading.crop, kc = kc_reading.kc)
+                        kc.save()
 
-            # add a year to every period_from and period_to date
-            for kc_reading in kc_readings:
-                kc = KCReading(period_from = kc_reading.period_from + relativedelta(years=+1), period_to = kc_reading.period_to + relativedelta(years=+1),
-                    season_id = season_to, created_by = request.user, region = kc_reading.region, crop = kc_reading.crop, kc = kc_reading.kc)
-                logger.debug(str(kc))
-                kc.save()
+                if fpr_flag:
+                    # Get all active sites
+                    sites = Site.objects.filter(is_active=True)
+                    probe = Probe.objects.get(serial_number='Manual')
+
+                    for site in sites:
+                        # get the full point and refill readings from the last season (season_from). We need to get the sites season start and end
+                        dates = get_site_season_start_end(site, season_from)
+                        readings = Reading.objects.select_related('site').filter(Q(type=2)|Q(type=3), site=site, date__range=(dates.period_from, dates.period_to))
+
+                        for r in readings:
+                            fpr = Reading(date=r.date + relativedelta(years=+1), type=r.type, site=r.site, created_by = request.user, serial_number=probe, reviewed=True,
+                                depth1=r.depth1, depth2=r.depth2, depth3=r.depth3, depth4=r.depth4, depth5=r.depth5, depth6=r.depth6, depth7=r.depth7, depth8=r.depth8,
+                                depth9=r.depth9, depth10=r.depth10, rz1=r.rz1, rz2=r.rz2, rz3=r.rz3)
+                            fpr.save()
+
+            except Exception as e:
+                messages.error(request, "Error: " + str(e))
 
         return render(request, 'create_season_resources.html', { 'form': CreateSeasonResourcesForm() })
 

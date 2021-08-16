@@ -23,11 +23,11 @@ class SoilProfileTypeForm(ModelForm):
 class CreateSeasonResourcesForm(forms.ModelForm):
     season_from = forms.ModelChoiceField(Season.objects.all().order_by('-season_date'), empty_label=None, widget=forms.Select())
     season_to = forms.ModelChoiceField(Season.objects.all().order_by('-current_flag'), empty_label=None, widget=forms.Select())
-    critical_date = forms.BooleanField(initial=True)
-    crop_coefficient = forms.BooleanField(initial=True)
+    critical_date = forms.BooleanField(initial=True, required=False)
+    fullpoint_refill = forms.BooleanField(initial=True, required=False)
+    crop_coefficient = forms.BooleanField(initial=True, required=False)
     helper = FormHelper()
     helper.form_class = 'form-horizontal'
-    helper.layout = Layout('farm','season')
 
     class Meta:
         model = Season
