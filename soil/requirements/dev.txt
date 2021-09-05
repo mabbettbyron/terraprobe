@@ -1,0 +1,2 @@
+# requirements/dev.txt
+-r _base.txt

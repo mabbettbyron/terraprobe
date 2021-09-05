@@ -1,0 +1,106 @@
+---
+- hosts: app_server
+  become: yes
+  gather_facts: no
+  remote_user: ubuntu
+  vars_files:
+    - aws_keys.yml
+    - vars.yml
+  vars:
+    soil_env:
+      HORTPLUS_JACK_KEY: "{{ hortplus_jack_key }}"
+      DJANGO_SECRET_KEY: "{{ django_secret_key }}"
+      SOIL_DB_PASSWORD: "{{ soil_db_password }}"
+      SOIL_DB_USER: "{{ soil_db_user }}"
+      SOIL_DB_NAME: "{{ soil_db_name }}"
+      HORTPLUS_API_KEY: "{{ hortplus_api_key }}"
+
+  tasks:
+    - name: Clone/pull project repo
+      git:
+        repo: "{{ project_repo }}"
+        dest: "{{ project_root }}/src/"
+        accept_hostkey: yes
+      become: yes
+      become_user: "{{ user_username }}"
+
+    - name: Write env variables to .profile of application user
+      blockinfile:
+        path: "{{ project_root }}/.profile"
+        state: present
+        create: yes
+        block: |
+          export HORTPLUS_JACK_KEY="{{ hortplus_jack_key }}"
+          export DJANGO_SECRET_KEY="{{ django_secret_key }}"
+          export SOIL_DB_PASSWORD="{{ soil_db_password }}"
+          export SOIL_DB_USER="{{ soil_db_user }}"
+          export SOIL_DB_NAME="{{ soil_db_name }}"
+          export HORTPLUS_API_KEY="{{ hortplus_api_key }}"
+        backup: yes
+      become: yes
+      become_user: "{{ user_username }}"
+
+    - name: Create virtual environment
+      become: yes
+      become_user: "{{ user_username }}"
+      command: python3 -m venv {{ project_root }}/env/
+      args:
+        creates: "{{ project_root }}/env/bin/python"
+
+    - name: Always activate virtual environment for {{ project_name }} user
+      lineinfile:
+        path: "{{ project_root }}/.bash_profile"
+        state: present
+        create: yes
+        line: "source {{ project_root }}/env/bin/activate"
+
+    - name: Set the DJANGO_SETTINGS_MODULE
+      lineinfile:
+        path: "{{ project_root }}/.bash_profile"
+        state: present
+        create: yes
+        line: "export DJANGO_SETTINGS_MODULE=soil.settings.dev"
+
+    - name: Install python packages
+      pip:
+        requirements: "{{ project_root }}/src/{{ project_name }}/requirements/dev.txt"
+        virtualenv: "{{ project_root }}/env"
+        virtualenv_site_packages: yes
+      become: yes
+      become_user: "{{ user_username }}"
+
+    - name: Django migrate
+      django_manage:
+        command: migrate
+        app_path: "{{ project_root }}/src/{{ project_name }}"
+        pythonpath: "{{ python_path }}"
+        settings: "{{ django_settings }}"
+        virtualenv: "{{ project_root }}/env/"
+      become: yes
+      become_user: "{{ user_username }}"
+      environment: "{{ soil_env }}"
+
+    - name: In staging load the test data suite (brendan20200805.json)
+      django_manage:
+        command: loaddata skeleton/dumps/brendan20200805.json
+        app_path: "{{ django_dir }}"
+        settings: "{{ django_settings }}"
+        virtualenv: "{{ project_root }}/env/"
+
+    - name: Django collect static
+      django_manage:
+        command: collectstatic
+        app_path: "{{ project_root }}/src/{{ project_name }}"
+        pythonpath: "{{ python_path }}"
+        settings: "{{ django_settings }}"
+        virtualenv: "{{ project_root }}/env/"
+      become: yes
+      become_user: "{{ user_username }}"
+
+    - name: Run uwsgi
+      shell: "(cd {{ project_root }}/src/{{ project_name }}; uwsgi --ini config/uwsgi.ini >/dev/null 2>&1 &)"
+      notify: restart nginx
+
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restarted

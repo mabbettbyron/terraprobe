@@ -52,7 +52,7 @@
 
     - name: Add apt repository for postgresql
       apt_repository:
-        repo: 'deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main'
+        repo: 'deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main'
         update-cache: yes
 
     - name: Install system packages
@@ -65,22 +65,21 @@
           - git
           - nginx
           - certbot
-          - postgresql-10
-          - postgresql-client-10
-          - postgresql-server-dev-10
+          - postgresql-11
+          - postgresql-client-11
+          - postgresql-server-dev-11
           - python3-dev
           - python3-pip
           - python3-venv
-          - python-psycopg2
-          - python-certbot-nginx
-          - virtualenv
+          - python3-certbot-nginx
+          - libpcre3-dev
           - ssl-cert
           - tzdata
           - unzip
 
-    - name: Make sure we run python3 by changing syslink for python sudo ln -sfn /usr/bin/python3.6 /usr/bin/python. Should create lrwxrwxrwx  1 root root          18 May  3 11:00  python -> /usr/bin/python3.7
+    - name: Make sure we run python3 by changing syslink for python sudo ln -sfn /usr/bin/python3.8 /usr/bin/python. Should create lrwxrwxrwx  1 root root          18 May  3 11:00  python -> /usr/bin/python3.7
       file:
-        src: /usr/bin/python3.6
+        src: /usr/bin/python3.8
         dest: /usr/bin/python
         state: link
         force: yes
@@ -91,31 +90,38 @@
         executable: pip3
         extra_args: --upgrade
 
-    - name: Install pip3 packages
+    - name: Install psycopg2
       pip:
         name: "{{ item }}"
         executable: pip3
       with_items:
-        - Django==3.0.6
         - psycopg2==2.8.4
-        - uWSGI==2.0.19.1
-        - django-address==0.2.2
-        - djangorestframework==3.11.0
-        - requests==2.22.0
-        - django-crispy-forms==1.9.0
-        - django-extensions==2.2.9
-        - django-tables2==2.2.1
-        - django-formtools==2.2
-        - django-bootstrap-datepicker-plus==3.0.5
-        - django-bootstrap4==1.1.1
-        - python-dateutil==2.8.1
-        - django-autocomplete-light==3.5.1
-        - django-cors-headers==3.4.0
-        - django-rest-auth==0.9.5
-        - coreapi==2.3.3
-        - numpy==1.19.2
-        - django-import-export==2.5.0
-        - djangorestframework_simplejwt==4.4.0
+
+    #- name: Install pip3 packages
+    #  pip:
+    #    name: "{{ item }}"
+    #    executable: pip3
+    #  with_items:
+    #    - Django==3.0.6
+    #    - psycopg2==2.8.4
+    #    - uWSGI==2.0.19.1
+    #    - django-address==0.2.2
+    #    - djangorestframework==3.11.0
+    #    - requests==2.22.0
+    #    - django-crispy-forms==1.9.0
+    #    - django-extensions==2.2.9
+    #    - django-tables2==2.2.1
+    #    - django-formtools==2.2
+    #    - django-bootstrap-datepicker-plus==3.0.5
+    #    - django-bootstrap4==1.1.1
+    #    - python-dateutil==2.8.1
+    #    - django-autocomplete-light==3.5.1
+    #    - django-cors-headers==3.4.0
+    #    - django-rest-auth==0.9.5
+    #    - coreapi==2.3.3
+    #    - numpy==1.19.2
+    #    - django-import-export==2.5.0
+    #    - djangorestframework_simplejwt==4.4.0
 
     - name: Create main directory for the project
       file:
@@ -160,7 +166,7 @@
     - name: Copy PostgreSQL authentication configuration
       template:
         src: ../../ansible_templates/pg_hba.j2
-        dest: /etc/postgresql/10/main/pg_hba.conf
+        dest: /etc/postgresql/11/main/pg_hba.conf
       notify:
         - restart postgresql
 
