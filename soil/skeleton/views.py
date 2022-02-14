@@ -164,6 +164,13 @@ class RecommendationReadyView(PermissionRequiredMixin, CreateView):
             api_url = settings.PROPERTIES_API_URL
             api_url = api_url + 'api/send-reports/irrigation'
             logger.debug('post to url ' + api_url)
+
+            # Hortplus has a database per season. So the one matching Terraprobe will be the formatted_season_start_year
+            current_season = get_current_season()
+            seasonal_database = current_season.formatted_season_start_year
+            seasonal_database = 'fruition_' + seasonal_database
+            logger.debug('seasonal_database ' + seasonal_database)
+
             site_serialized_data = []
             for review in reviewed:
                 reading = Reading.objects.get(id=review)
@@ -181,9 +188,9 @@ class RecommendationReadyView(PermissionRequiredMixin, CreateView):
             headers = {
                 "X-Api-Key": key,
                 "Content-Type":"application/json",
-                "SeasonalDatabase":"fruition_2020",
+                "SeasonalDatabase":seasonal_database,
                 "service":"fruition"}
-
+            logger.debug(str(headers))
 
             r = requests.post(api_url, headers=headers, data=json.dumps(data))
             logger.debug('status_code:' + str(r.status_code))
@@ -196,6 +203,7 @@ class RecommendationReadyView(PermissionRequiredMixin, CreateView):
                 messages.info(request, 'Users Not Sent Report: ' + str(ojson['users_not_sent_report']))
             else:
                 raise Exception("Error processing request:" + str(r.status_code))
+
         except Exception as e:
             messages.error(request, "Error: " + str(e))
         return render(request, 'recommendation_ready.html', { 'form': SiteReportReadyForm() })
