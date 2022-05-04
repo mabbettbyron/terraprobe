@@ -174,7 +174,7 @@ class Command(BaseCommand):
 
 def post_request(data, serial):
     try:
-        r = requests.post('https://hortplus.metwatch.nz/index.php?pageID=wxn_wget_post&serial=' + serial, data=data)
+        r = requests.post('https://legacy.hortplus.metwatch.nz/index.php?pageID=wxn_wget_post&serial=' + serial, data=data)
         logger.debug('data in request ' + str(data))
         if r.status_code == 200:
             logger.debug('response ' + str(r.text))
