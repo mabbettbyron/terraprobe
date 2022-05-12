@@ -346,9 +346,6 @@ class EOYFarmSummary(APIView):
                 },
                 {
                     "May": 13
-                },
-                {
-                    "Jun": 3
                 }]
         ten_year_average_rainfall = 0
 

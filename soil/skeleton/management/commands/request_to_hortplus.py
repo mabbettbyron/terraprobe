@@ -117,7 +117,7 @@ class Command(BaseCommand):
             station = kwargs['stations']
             logger.debug("Generating average rainfall for last 10 years back from " + current_year_date + " for station " + station)
 
-            for month in ['10','11','12','01','02','03','04','05','06']:
+            for month in ['10','11','12','01','02','03','04','05']:
                 rain_data[month] = {
                     'avg' : 0,
                     'cur' : 0
@@ -130,12 +130,12 @@ class Command(BaseCommand):
                 date = str(year) + '-10-02'
                 start_dates.append(date)
                 x = x + 1
-            logger.debug('We will be getting rainfall data for ' + str(start_dates) + ' + 272 days')
+            logger.debug('We will be getting rainfall data for ' + str(start_dates) + ' + 242 days')
 
             # We will have the current year, and the previous 10 years in array
             for start_date in start_dates:
                 data = {
-                    'period': 272, # 272 days will take us to 30th of June (except leap years but don't need to be exact)
+                    'period': 242, # 242 days will take us to 31st of May (except leap years but don't need to be exact)
                     'startdate' : start_date,
                     'format' : 'csv',
                     'interval': 'D',
