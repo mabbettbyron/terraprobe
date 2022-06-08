@@ -103,14 +103,20 @@ def calculate_soil_averages_for_all_sites(season_id):
             split_key = key.split("-")
             crop = Crop.objects.get(id=int(split_key[1]))
 
-            total_eff_irrigation = round(total_eff_irrigation / total_sites)
+            try:
+                total_eff_irrigation = round(total_eff_irrigation / total_sites)
+            except ZeroDivisionError:
+                total_eff_irrigation = 0
             logger.debug('Total eff irrigation ' + str(total_eff_irrigation) + ' Total irrigation' + str(total_irrigation_mms) + ' total sites ' +
                 str(total_sites))
 
             total_eff_irrigation_perc = 0
 
             if total_sites > 0:
-                total_eff_irrigation_perc = round(total_eff_irrigation /  round(total_irrigation_mms / total_sites) * 100)
+                try:
+                    total_eff_irrigation_perc = round(total_eff_irrigation /  round(total_irrigation_mms / total_sites) * 100)
+                except ZeroDivisionError:
+                    total_eff_irrigation_perc = 0
 
             logger.debug('Total eff irrigation percentage %' + str(total_eff_irrigation_perc))
             SeasonalSoilStat.objects.update_or_create(season=season.season, soil_type=split_key[0], crop=crop, total_irrigation_mms=total_irrigation_mms,
