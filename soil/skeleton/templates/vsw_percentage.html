@@ -253,6 +253,7 @@ var seasons_refill_readings = []
 var seasons_upper_strategy = []
 var seasons_lower_strategy = []
 var strategy_percentage = 0
+var strategy_name = 'None'
 
 var season_grouping = [];
 vsw_count = 10; // delivered by vsw_reading api
@@ -291,13 +292,13 @@ promises = get_graph_data(site_id, period_from, period_to, season_id)
 Promise.all(promises).then(function(values) {
 
     values[1].forEach(function(strategy) {
-
+        //console.log(strategy.strategy_name)
         season_critical_dates[strategy.critical_date_type] = [{
             'date': parseTime(strategy.critical_date),
             'id': strategy.criticaldate_id
         }];
-        //[strategy.critical_date_type] = parseTime(strategy.critical_date);
 
+        strategy_name = strategy.strategy_name
         strategy_percentage = strategy.strategy_percentage; // This is the overall strategy percentage for the strategy type
         parsed_date = parseTime(strategy.strategy_date);
 

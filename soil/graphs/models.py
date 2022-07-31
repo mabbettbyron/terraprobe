@@ -100,4 +100,4 @@ class vsw_strategy(models.Model):
 
     class Meta:
         managed = False
-        db_table = "graphs_strategy"
+        db_table = "graphs_strategy_v2"

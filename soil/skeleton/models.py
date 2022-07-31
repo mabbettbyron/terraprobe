@@ -327,6 +327,7 @@ class Site(models.Model):
     #Scheduling
     upper_limit = models.ForeignKey(ReadingType, related_name="upper_limit_type", null=True, blank=True, on_delete=models.CASCADE, help_text="Target Upper line for Graph")
     lower_limit = models.ForeignKey(ReadingType, related_name="lower_limit_type", null=True, blank=True, on_delete=models.CASCADE, help_text="Target Lower line for Graph")
+    # delete strategy
     strategy = models.ForeignKey(StrategyType, null=True, blank=True, on_delete=models.CASCADE)
 
     emitter_rate = models.FloatField(null=False, default=1)
@@ -400,6 +401,18 @@ class SeasonStartEnd(models.Model):
         managed = False
         db_table = "skeleton_season_start_end"
         unique_together = (('site', 'season'),)
+
+# SeasonStrategy - Each Site can have a different Strategy per Season
+
+class SeasonStrategy(models.Model):
+    site = models.ForeignKey(SiteDescription, on_delete=models.CASCADE)
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    strategytype = models.ForeignKey(StrategyType, on_delete=models.CASCADE)
+    created_date = models.DateTimeField('date published', default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE,default=User)
+
+    class Meta:
+        unique_together = (('site', 'season', 'strategytype'))
 
 class Diviner(models.Model):
     diviner_number = models.CharField(max_length=50, null=False)

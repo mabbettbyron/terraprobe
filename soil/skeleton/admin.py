@@ -9,11 +9,16 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import (Farm, Site, SiteDescription, Crop, Product, Reading, SoilProfileType, Calibration, ReadingType, Probe,
     Season, ETReading, KCReading, Diviner, ProbeDiviner, CriticalDateType, CriticalDate, UserFullName, SeasonStartEnd, WeatherStation,
-    Document, Variety, Strategy, StrategyType, SeasonalSoilStat)
+    Document, Variety, Strategy, StrategyType, SeasonStrategy, SeasonalSoilStat)
 from .forms import SoilProfileTypeForm
 
 import logging
 logger = logging.getLogger(__name__)
+
+class SeasonStrategyAdmin(admin.ModelAdmin):
+    list_display = ('site', 'season', 'strategytype')
+    list_filter = ['strategytype', 'season']
+    search_fields = ['site__name']
 
 class SoilProfileTypeAdmin(admin.ModelAdmin):
     form = SoilProfileTypeForm
@@ -154,6 +159,7 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = ['description', 'document']
     list_filter = ['description',]
 
+
 admin.site.register(Site, SiteAdmin)
 admin.site.register(Farm, FarmAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -177,3 +183,4 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(Variety)
 admin.site.register(Strategy, StrategyAdmin)
 admin.site.register(StrategyType, StrategyTypeAdmin)
+admin.site.register(SeasonStrategy, SeasonStrategyAdmin)
