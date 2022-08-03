@@ -87,7 +87,8 @@ class SeasonAdmin(admin.ModelAdmin):
     list_display = ('name', 'formatted_season_start_year', 'current_flag')
 
 class FarmAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'weatherstation')
+    list_display = ('name', 'address', 'weatherstation', 'is_active')
+    list_filter = ['is_active']
 
 class CalibrationAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'soil_type', 'period_from', 'period_to', 'slope', 'intercept')
@@ -107,7 +108,7 @@ class SiteAdmin(admin.ModelAdmin):
         ('Depths',  {'fields': [('depth1', 'depth_he1', 'profile1'),('depth2', 'depth_he2', 'profile2'),('depth3', 'depth_he3', 'profile3'),
             ('depth4', 'depth_he4', 'profile4'), ('depth5', 'depth_he5','profile5'),('depth6', 'depth_he6','profile6'),('depth7', 'depth_he7','profile7'),
             ('depth8', 'depth_he8','profile8'), ('depth9', 'depth_he9','profile9'),('depth10', 'depth_he10','profile10')],'classes': ['collapse']}),
-        ('Schedule',    {'fields': ['upper_limit', 'lower_limit', 'strategy', 'emitter_rate', 'row_spacing', 'emitter_spacing', 'plant_spacing'],
+        ('Schedule',    {'fields': ['upper_limit', 'lower_limit', 'emitter_rate', 'row_spacing', 'emitter_spacing', 'plant_spacing'],
             'classes': ['collapse']}),
     ]
     radio_fields = {'irrigation_method': admin.HORIZONTAL}

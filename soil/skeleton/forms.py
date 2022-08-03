@@ -35,7 +35,7 @@ class CreateSeasonResourcesForm(forms.ModelForm):
 
 
 class EOYReportForm(forms.ModelForm):
-    farm = forms.ModelChoiceField(Farm.objects.all().order_by('name'), widget=forms.Select())
+    farm = forms.ModelChoiceField(Farm.objects.filter(is_active=True).order_by('name'), widget=forms.Select())
     season = forms.ModelChoiceField(Season.objects.all().order_by('-current_flag'), empty_label=None, widget=forms.Select())
     template = forms.ModelChoiceField(Document.objects.filter(description='EOY'), empty_label=None, widget=forms.Select())
     helper = FormHelper()
@@ -134,7 +134,7 @@ class DocumentForm(forms.ModelForm):
 
 class SiteReadingsForm(forms.ModelForm):
 
-    farm = forms.ModelChoiceField(Farm.objects.all().order_by('-name'), widget=forms.Select())
+    farm = forms.ModelChoiceField(Farm.objects.filter(is_active=True).order_by('-name'), widget=forms.Select())
     site = forms.ModelChoiceField(SiteDescription.objects.filter(is_active=True).order_by('site_number'), widget=forms.Select())
     technician = forms.ModelChoiceField(queryset=UserFullName.objects.filter(groups__name='Technician'), widget=forms.Select())
     season = forms.ModelChoiceField(Season.objects.all().order_by('-current_flag'), empty_label=None, widget=forms.Select()) # current season is at top

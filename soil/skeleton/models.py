@@ -151,7 +151,8 @@ class Farm(models.Model):
     mobile = models.CharField(max_length=40, null=True, blank=True)
     #Web
     email = models.EmailField(null=True, blank=True)
-
+    is_active = models.BooleanField(default=True)
+    
     created_date = models.DateTimeField('date published', default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, default=User)
 
