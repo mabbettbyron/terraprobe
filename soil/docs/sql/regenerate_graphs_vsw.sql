@@ -130,7 +130,7 @@ FROM
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he1
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone1"
 ---------
@@ -156,7 +156,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he2
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone2"
 ON zone1.date = zone2.date AND zone1.id = zone2.id AND zone1.type_id = zone2.type_id
@@ -183,7 +183,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he3
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone3"
 ON zone1.date = zone3.date AND zone1.id = zone3.id AND zone1.type_id = zone3.type_id
@@ -210,7 +210,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he4
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone4"
 ON zone1.date = zone4.date AND zone1.id = zone4.id AND zone1.type_id = zone4.type_id
@@ -237,7 +237,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he5
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone5"
 ON zone1.date = zone5.date AND zone1.id = zone5.id AND zone1.type_id = zone5.type_id
@@ -264,7 +264,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he6
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone6"
 ON zone1.date = zone6.date AND zone1.id = zone6.id AND zone1.type_id = zone6.type_id
@@ -291,7 +291,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he7
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone7"
 ON zone1.date = zone7.date AND zone1.id = zone7.id AND zone1.type_id = zone7.type_id
@@ -318,7 +318,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he8
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone8"
 ON zone1.date = zone8.date AND zone1.id = zone8.id AND zone1.type_id = zone8.type_id
@@ -345,7 +345,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he9
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone9"
 ON zone1.date = zone9.date AND zone1.id = zone9.id AND zone1.type_id = zone9.type_id
@@ -372,7 +372,7 @@ LEFT JOIN
     LEFT JOIN skeleton_calibration ON skeleton_calibration.soil_type = skeleton_site.depth_he10
     RIGHT JOIN skeleton_reading ON skeleton_reading.site_id = skeleton_site.id AND skeleton_reading.serial_number_id = skeleton_calibration.serial_number_id
         AND skeleton_reading.date > skeleton_calibration.period_from
-        --AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
+        AND skeleton_reading.date < COALESCE(skeleton_calibration.period_to, now() + INTERVAL '15 day')
     LEFT JOIN skeleton_readingtype ON skeleton_readingtype.id = skeleton_reading.type_id
 ) AS "zone10"
 ON zone1.date = zone10.date AND zone1.id = zone10.id AND zone1.type_id = zone10.type_id;
