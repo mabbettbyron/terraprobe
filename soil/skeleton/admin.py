@@ -87,8 +87,8 @@ class SeasonAdmin(admin.ModelAdmin):
     list_display = ('name', 'formatted_season_start_year', 'current_flag')
 
 class FarmAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'weatherstation', 'is_active')
-    list_filter = ['is_active']
+    list_display = ('name', 'address', 'weatherstation', 'is_active', 'sentek')
+    list_filter = ['is_active', 'sentek']
 
 class CalibrationAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'soil_type', 'period_from', 'period_to', 'slope', 'intercept')
