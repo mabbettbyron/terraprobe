@@ -167,8 +167,8 @@ class RecommendationReadyView(PermissionRequiredMixin, CreateView):
 
             # Hortplus has a database per season. So the one matching Terraprobe will be the formatted_season_start_year
             current_season = get_current_season()
-            seasonal_database = current_season.formatted_season_start_year
-            seasonal_database = 'fruition_' + seasonal_database
+            seasonal_database = int(current_season.formatted_season_start_year) + 1
+            seasonal_database = 'fruition_' + str(seasonal_database)
             logger.debug('seasonal_database ' + seasonal_database)
 
             site_serialized_data = []
