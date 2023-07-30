@@ -8,7 +8,7 @@ from crispy_forms.layout import Layout
 from django.forms.widgets import TextInput
 
 from django.forms import ModelChoiceField, ModelMultipleChoiceField, ModelForm, CheckboxInput
-from bootstrap_datepicker_plus import DatePickerInput
+from bootstrap_datepicker_plus.widgets import DatePickerInput
 import datetime
 from dal import autocomplete
 
@@ -126,7 +126,7 @@ class CreateRefillFullPointForm(forms.Form):
     types_copy = forms.BooleanField(required=False)
 
 class DocumentForm(forms.ModelForm):
-    document = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    document = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': False}))
 
     class Meta:
         model = Document

@@ -182,7 +182,9 @@
       service: name=postgresql state=started
 
     - name: Create database user
+      become: true
       become_user: postgres
+      become_method: su
       postgresql_user: name={{ soil_db_user }} password={{ soil_db_password }} role_attr_flags=CREATEDB,LOGIN encrypted=yes
 
     - name: Create database

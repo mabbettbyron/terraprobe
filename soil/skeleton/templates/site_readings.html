@@ -8,7 +8,7 @@
 
 <form method="post" id="readingForm" data-sites-url="{% url 'ajax_load_sites' %}" novalidate>
     {% csrf_token %}
-    <div class="container-sm">
+    <div class="container-fluid">
         <div class="row selector">
             <div class="col-sm-1">
                 <button type="button" class="btn bg-green btn-sm" id="previousSite">Previous</button>

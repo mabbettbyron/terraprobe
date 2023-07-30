@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'skeleton.apps.SkeletonConfig',
     'graphs.apps.GraphsConfig',
     'crispy_forms',
+    'crispy_bootstrap4',
     'django_extensions',
     'django_tables2',
     'formtools',
