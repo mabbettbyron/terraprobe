@@ -116,6 +116,8 @@
         - numpy==1.25.1
         - django-import-export==3.2.0
         - djangorestframework_simplejwt==5.2.2
+        - crispy-bootstrap4==2022.1
+        - pydantic==2.1.1
 
     - name: Create main directory for the project
       file:
