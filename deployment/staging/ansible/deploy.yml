@@ -43,35 +43,35 @@
       become: yes
       become_user: "{{ user_username }}"
 
-    - name: Django migrate
-      django_manage:
-        command: migrate
-        app_path: "{{ project_root }}/src/{{ project_name }}"
-        pythonpath: "{{ python_path }}"
-        settings: "{{ django_settings }}"
-      become: yes
-      become_user: "{{ user_username }}"
-      environment: "{{ soil_env }}"
+#    - name: Django migrate
+#      django_manage:
+#        command: migrate
+#        app_path: "{{ project_root }}/src/{{ project_name }}"
+#        pythonpath: "{{ python_path }}"
+#        settings: "{{ django_settings }}"
+#      become: yes
+#      become_user: "{{ user_username }}"
+#      environment: "{{ soil_env }}"
 
-    - name: In staging load the test data suite (brendan20200805.json)
-      django_manage:
-        command: loaddata skeleton/dumps/brendan20200805.json
-        app_path: "{{ django_dir }}"
-        settings: "{{ django_settings }}"
-
-    - name: Django collect static
-      django_manage:
-        command: collectstatic
-        app_path: "{{ project_root }}/src/{{ project_name }}"
-        pythonpath: "{{ python_path }}"
-        settings: "{{ django_settings }}"
-      become: yes
-      become_user: "{{ user_username }}"
-
-    - name: Run uwsgi
-      shell: "(cd {{ project_root }}/src/{{ project_name }}; uwsgi --ini config/uwsgi.ini >/dev/null 2>&1 &)"
-      notify: restart nginx
-
-  handlers:
-  - name: restart nginx
-    service: name=nginx state=restarted
+#    - name: In staging load the test data suite (brendan20200805.json)
+#      django_manage:
+#        command: loaddata skeleton/dumps/brendan20200805.json
+#        app_path: "{{ django_dir }}"
+#        settings: "{{ django_settings }}"
+#
+#    - name: Django collect static
+#      django_manage:
+#        command: collectstatic
+#        app_path: "{{ project_root }}/src/{{ project_name }}"
+#        pythonpath: "{{ python_path }}"
+#        settings: "{{ django_settings }}"
+#      become: yes
+#      become_user: "{{ user_username }}"
+#
+#    - name: Run uwsgi
+#      shell: "(cd {{ project_root }}/src/{{ project_name }}; uwsgi --ini config/uwsgi.ini >/dev/null 2>&1 &)"
+#      notify: restart nginx
+#
+#  handlers:
+#  - name: restart nginx
+#    service: name=nginx state=restarted
