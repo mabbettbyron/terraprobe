@@ -1,6 +1,7 @@
 from ._base import *
 
 PROPERTIES_API_URL = 'https://api.properties.hortplus.com/'
+METWATCH_API_URL = 'https://api.metwatch.nz/'
 
 DEBUG = False
 

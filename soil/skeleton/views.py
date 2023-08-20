@@ -406,7 +406,7 @@ def index(request):
             if button_clicked == 'processall':
                 management.call_command('processall_readings')
             if button_clicked == 'load-rainfall':
-                management.call_command('request_to_hortplus', purpose='process_readings')
+                management.call_command('request_to_hortplus_v2', purpose='process_readings')
         except Exception as e:
             messages.error(request, "Error: " + str(e))
 

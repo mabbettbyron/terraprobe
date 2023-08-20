@@ -1,3 +1,12 @@
+'''
+    Request to new Hortplus weather service. https://staging.api.metwatch.nz
+
+    This started just as a copy of the existing request to there old csv service
+
+    Example: (old API key)
+    curl --location --request GET 'https://staging.api.metwatch.nz/api/legacy/historic/daily?station=HAV&start=2022-09-08&stop=2022-09-20' -H "Accept: application/json" -H "X-Api-Key: fUjXn2r5u8x/A?D(G+KbPeShVkYp3s6v"
+'''
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta, date
@@ -15,42 +24,33 @@ import logging
 logger = logging.getLogger(__name__)
 
 '''
-    From command line can just run:
-
-    python manage.py request_to_hortplus --stations=HAV --period=8 --startdate=2019-9-26 --format=csv --interval=D --stations=PKT --metvars=RN_T --settings=soil.settings.dev
-
+    From command line can just run 'python manage.py request_to_hortplus_v2 --station=HAV --start=2022-09-08 --stop=2022-09-20 --keys=RNDATA
 '''
 
 class Command(BaseCommand):
-    help = 'Requests data from hortplus'
+    help = 'Requests data from hortplus version 2'
 
     def add_arguments(self, parser):
         parser.add_argument('-P', '--purpose', type=str, help='One of process_readings or generate_eoy_data')
-        parser.add_argument('-s', '--serial', type=str, help='Hortplus serial number generated individually for a user')
-        parser.add_argument('-p', '--period', type=int, help='The number of records for the specified interval, counting backwards from now (unless a startdate provided)')
-        parser.add_argument('-d', '--startdate', type=str, help='The date to start providing data from. This forces the period to count forwards from this date. Format YYYY-MMDD')
-        parser.add_argument('-f', '--format', type=str, help='The format the resulting data should be provided as')
-        parser.add_argument('-i', '--interval', type=str, help='The type of weather data. H for hourly and D for daily.')
-        parser.add_argument('-t', '--stations', type=str, help='The list of weather station ids separated by a comma.')
-        parser.add_argument('-m', '--metvars', type=str, help='The list of weather variable and measurement type TD_M,RN_T combined with an underscore, separated by a comma.')
+        parser.add_argument('-d', '--start', type=str, help='The date to start providing data from. Format YYYY-MM-DD')
+        parser.add_argument('-p', '--stop', type=str, help='The date to stop providing data from. Format YYYY-MM-DD')
+        parser.add_argument('-t', '--station', type=str, help='The list of weather station ids separated by a comma.')
+        parser.add_argument('-k', '--keys', type=str, help='The common keys to get out of what is returned. At the moment will just be RNDATA ')
         parser.add_argument('--sites', type=open, help='A list of sites to get request rainfall for.')
 
     def handle(self, *args, **kwargs):
         response_text = None
         # get arguments from command line or use ones that will be done autoamtically
-        serial = kwargs['serial'] if kwargs['serial'] else os.getenv('HORTPLUS_JACK_KEY')
+
         if kwargs['purpose'] is None:
             data = {
-                'period': kwargs['period'], # 7
-                'format': kwargs['format'], # csv
-                'interval': kwargs['interval'], # D
-                'stations': kwargs['stations'], # HAV
-                'metvars' : kwargs['metvars'] # RN_T
+                'start': kwargs['start'],
+                'stop': kwargs['stop'],
+                'station': kwargs['station']
             }
-            # startdate is optional
-            if kwargs['startdate']:
-                data['startdate'] = kwargs['startdate']
-            response_text = post_request(data, serial)
+            data_keys = kwargs['keys']
+            response = post_request(data, 'RNDATA')
+            logger.debug('Response ' + str(response))
         elif kwargs['purpose'] == 'process_readings':
             logger.info('Start processing of readings')
             readings = None
@@ -76,40 +76,31 @@ class Command(BaseCommand):
                     farm = site.farm
                     weatherstation = farm.weatherstation
 
-                    days = (reading.date  - previous_reading.date).days - 1
                     logger.debug('Previous Reading:' + str(previous_reading))
-                    logger.debug(days)
+                    logger.debug('Todays Reading:' + str(reading.date))
+                    # Startdate is previous reading plus one day
                     startdate = previous_reading.date + timedelta(days=1)
-                    logger.debug('startdate' + str(startdate))
+                    logger.debug('startdate:' + str(startdate) + ' stopdate:' + str(reading.date))
 
                     data = {
-                        'period': days,
-                        'startdate' : str(startdate),
-                        'format' : 'csv',
-                        'interval': 'D',
-                        'stations': weatherstation.code,
-                        'metvars' : 'RN_T'
+                        'start': str(startdate),
+                        'stop': str(reading.date),
+                        'station': weatherstation.code
                     }
 
-                    response_text = post_request(data, serial)
-
-                    lines = response_text.split("\n")
-                    del lines[0]
+                    response = post_request(data, 'RNDATA')
+                    logger.debug('Response ' + str(response))
                     rainfall = 0
-                    for line in lines:
-                        valid = re.search("^\w.*", line) # make sure we have a valid line to split
-                        if valid:
-                            fields = line.split(",")
-                            if fields[3] != '-' and fields[3] != '.':
-                                rainfall += float(fields[3])
-                            logger.debug(str(rainfall))
+                    for rain in response:
+                        logger.debug('Rain:' + str(rain))
+                        rainfall += float(rain)
+                    logger.debug('Total Rainfall:' + str(rainfall))
                     reading.rain = round(rainfall, 1)
                     reading.save()
                 else:
                     logger.debug('No previous reading for site so cannot calculate a rain reading')
         elif kwargs['purpose'] == 'generate_eoy_data':
             rain_data = {} # Keyed by the weatherstation code and the value will be the sum of rain / 10 years
-            #current_rain_data = {}
             start_dates = [] # 10 start dates starting at the 1st October of current year. Actually 2nd cause of the way API works
 
             season = Season.objects.get(current_flag=True)
@@ -138,6 +129,11 @@ class Command(BaseCommand):
             # We will have the current year, and the previous 10 years in array
             for start_date in start_dates:
                 data = {
+                    'start': start_date,
+                    'stop': str(reading.date),
+                    'station': station
+                }
+                data = {
                     'period': 242, # 242 days will take us to 31st of May (except leap years but don't need to be exact)
                     'startdate' : start_date,
                     'format' : 'csv',
@@ -146,7 +142,7 @@ class Command(BaseCommand):
                     'metvars' : 'RN_T'
                 }
 
-                response_text = post_request(data, serial)
+                response_text = post_request(data, 'RNDATA')
 
                 lines = response_text.split("\n")
                 del lines[0]
@@ -175,14 +171,21 @@ class Command(BaseCommand):
     post_request
 '''
 
-def post_request(data, serial):
-    try:
-        r = requests.post('https://legacy.hortplus.metwatch.nz/index.php?pageID=wxn_wget_post&serial=' + serial, data=data)
-        logger.debug('data in request ' + str(data))
-        if r.status_code == 200:
-            logger.debug('response ' + str(r.text))
-            return r.text
-        else:
-            raise Exception("Error processing request:" + str(r.text))
-    except Exception as e:
-        messages.error(request, "Error: " + str(e))
+def post_request(data, metvars):
+
+    api_key = os.getenv('HORTPLUS_METWATCH_API_KEY')
+    api_url = settings.METWATCH_API_URL
+    api_url = api_url + 'api/legacy/historic/daily?station=' + data["station"] + '&start=' + data["start"]  + '&stop=' + data["stop"]
+    headers = {
+        "X-Api-Key": api_key,
+        "Accept":"application/json"}
+    logger.debug(str(headers))
+    logger.debug(api_url)
+    r = requests.get(api_url, headers=headers)
+    logger.debug('data in request ' + str(r))
+    if r.status_code == 200:
+        ojson = json.loads(r.text)
+        #logger.debug('response ' + ojson)
+        return ojson[metvars]
+    else:
+        raise Exception("Error processing request:" + str(r.text))
